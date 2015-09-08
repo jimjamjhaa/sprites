@@ -1,0 +1,130 @@
+<DOCTYPE html>
+<html lang="en">
+<!-- saved from url=(0014)about:internet -->
+<head>
+<meta charset="utf-8">
+<style type="text/css">
+body{
+background-color:black;
+position:fixed;
+}
+.sprite{
+position:absolute;
+border:solid black 2px;
+font-weight:bold;
+border-radius:10px;
+}
+</style>
+<script type="text/javascript">
+
+var spriteObject = {
+	height:5,
+	width:5,
+	top:0,
+	left:0,
+	direction:"down",
+	color:0,
+	status:"alive"
+};
+var sprites = [];
+var elements = [];
+var maxSprites = 400;
+var Color = 1;
+
+
+function populate(){
+	for(var i = 0;i < maxSprites;i++){
+		var sprite = Object.create(spriteObject);
+		sprites.push(sprite);
+		var element = document.createElement("span");
+		elements.push("element"+i);
+		element.setAttribute("class","sprite");
+		element.setAttribute("id","element"+i);
+		document.body.appendChild(element);
+		if(Color==1){element.style.backgroundColor="blue"}
+		else if(Color==2){element.style.backgroundColor="green"}
+		else if(Color==3){element.style.backgroundColor="red"}
+		else if(Color==4){element.style.backgroundColor="yellow"}
+		else if(Color==5){element.style.backgroundColor="silver"}
+		else if(Color==6){element.style.backgroundColor="purple"}
+		sprites[i].color = Color;
+		Color++
+		if(Color>6){Color = 1}
+		element.innerHTML = " :)-";
+		var size = Math.ceil(Math.random()*10);
+		sprites[i].width = sprite.width+size;
+		sprites[i].height = sprite.height+size;
+		element.style.height = sprite.height+"px";
+		element.style.width = sprite.width+"px";
+		sprite.top = Math.ceil(Math.random()*window.innerHeight);
+		sprite.left = Math.ceil(Math.random()*window.innerWidth);
+		element.style.top = sprite.top + "px";
+		element.style.left = sprite.left + "px";
+	}
+	window.setInterval(function(){move()},100);
+}
+
+function move(){
+	var element = function(id,sprite){document.getElementById(id).style.top = sprite.top + "px";
+		document.getElementById(id).style.left = sprite.left + "px";};
+	for(var i = 0;i<sprites.length;i++){
+		if(sprites[i].status == "alive"){
+			var random = Math.ceil(Math.random()*20);
+			if(sprites[i].direction=="down"){if(random==1||random==4){sprites[i].direction="down";}else if(random==2){sprites[i].direction="right";}else if(random==3){sprites[i].direction="left"}}
+			else if(sprites[i].direction=="up"){if(random==1||random==4){sprites[i].direction="up";}else if(random==2){sprites[i].direction="right";}else if(random==3){sprites[i].direction="left"}}
+			else if(sprites[i].direction=="right"){if(random==1||random==4){sprites[i].direction="right";}else if(random==2){sprites[i].direction="up";}else if(random==3){sprites[i].direction="down"}}
+			else if(sprites[i].direction=="left"){if(random==1||random==4){sprites[i].direction="left";}else if(random==2){sprites[i].direction="up";}else if(random==3){sprites[i].direction="down"}}
+			if(sprites[i].direction=="down"){sprites[i].top += Math.ceil(Math.random()*20);}
+			else if(sprites[i].direction=="up"){sprites[i].top -= Math.ceil(Math.random()*20);}
+			else if(sprites[i].direction=="right"){sprites[i].left += Math.ceil(Math.random()*20);}
+			else if(sprites[i].direction=="left"){sprites[i].left -= Math.ceil(Math.random()*20);}
+			for(var j = 0;j<sprites.length;j++){
+				function eat(a,b){
+					if(sprites[a].height>=sprites[b].height){
+						sprites[a].width = sprites[a].width + (sprites[b].width / 8);
+						document.getElementById("element"+a).style.width = sprites[a].width +"px";
+						sprites[a].height = sprites[a].height + (sprites[b].height / 8);
+						document.getElementById("element"+a).style.height = sprites[a].height +"px";
+						sprites[b].status = "dead";
+						document.getElementById("element"+b).style.display = "none";
+					}
+					else{
+						sprites[b].width = sprites[b].width + (sprites[a].width / 8);
+						document.getElementById("element"+b).style.width = sprites[b].width +"px";
+						sprites[b].height = sprites[b].height + (sprites[a].height / 8);
+						document.getElementById("element"+b).style.height = sprites[b].height +"px";
+						sprites[a].status = "dead";
+						document.getElementById("element"+a).style.display = "none";
+					}
+				}
+				if((((sprites[i].top + sprites[i].height)>(sprites[j].top) && (sprites[i].top + sprites[i].height)<(sprites[j].top + sprites[j].height))&&(((sprites[i].left + sprites[i].width)>(sprites[j].left) && (sprites[i].left + sprites[i].width)<(sprites[j].left + sprites[j].width))||((sprites[i].left)>(sprites[j].left) && (sprites[i].left)<(sprites[j].left + sprites[j].width))))){
+					if((sprites[i].color != sprites[j].color)&&(sprites[j].status=="alive")){eat(i,j);}
+					else {sprites[i].direction = 'up';sprites[j].direction = 'down';sprites[i].top = sprites[j].top - sprites[i].height - 1;}
+				}
+				if((((sprites[i].top)>(sprites[j].top) && (sprites[i].top)<(sprites[j].top + sprites[j].height))&&(((sprites[i].left + sprites[i].width)>(sprites[j].left) && (sprites[i].left + sprites[i].width)<(sprites[j].left + sprites[j].width))||((sprites[i].left)>(sprites[j].left) && (sprites[i].left)<(sprites[j].left + sprites[j].width))))){
+					if((sprites[i].color != sprites[j].color)&&(sprites[j].status=="alive")){eat(i,j);}
+					else {sprites[i].direction = 'down';sprites[j].direction = 'up';sprites[i].top = sprites[j].top + sprites[j].height + 1;}
+				}
+				if((((sprites[i].left + sprites[i].width)>(sprites[j].left) && (sprites[i].left + sprites[i].width)<(sprites[j].left + sprites[j].width))&&(((sprites[i].top + sprites[i].height)>(sprites[j].top) && (sprites[i].top + sprites[i].height)<(sprites[j].top + sprites[j].height))||((sprites[i].top)>(sprites[j].top) && (sprites[i].top)<(sprites[j].top + sprites[j].height))))){
+					if((sprites[i].color != sprites[j].color)&&(sprites[j].status=="alive")){eat(i,j);}
+					else {sprites[i].direction = 'left';sprites[j].direction = 'right';sprites[i].left = sprites[j].left - sprites[i].width - 1;}
+				}
+				if((((sprites[i].left)>(sprites[j].left) && (sprites[i].left)<(sprites[j].left + sprites[j].width))&&(((sprites[i].top + sprites[i].height)>(sprites[j].top) && (sprites[i].top + sprites[i].height)<(sprites[j].top + sprites[j].height))||((sprites[i].top)>(sprites[j].top) && (sprites[i].top)<(sprites[j].top + sprites[j].height))))){
+					if((sprites[i].color != sprites[j].color)&&(sprites[j].status=="alive")){eat(i,j);}
+					else {sprites[i].direction = 'right';sprites[j].direction = 'left';sprites[i].left = sprites[j].left + sprites[j].width + 1;}
+				}
+			}
+			if(sprites[i].top < -sprites[i].height){sprites[i].top = window.innerHeight;}
+			if(sprites[i].top > window.innerHeight){sprites[i].top = -sprites[i].height;}
+			if(sprites[i].left < -sprites[i].width){sprites[i].left = window.innerWidth;}
+			if(sprites[i].left > window.innerWidth){sprites[i].left = -sprites[i].width;}
+			element(elements[i],sprites[i]);
+		}	
+	}
+}
+</script>
+</head>
+<body onload="populate()">
+
+</body>
+</html>
